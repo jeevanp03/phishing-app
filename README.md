@@ -1,67 +1,113 @@
 # PhishGen & PhishBuster
 
-A Next.js web application that demonstrates how AI can both generate phishing emails and detect them. Built for educational purposes to help understand and identify phishing tactics.
-
-## Quick Start
-
-1. **Clone and Install**
-
-   ```bash
-   git clone <repository-url>
-   cd phishing-app
-   npm install
-   ```
-
-2. **Get API Key**
-
-   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-   - Create a new API key
-   - Copy the key
-
-3. **Setup Environment**
-
-   ```bash
-   # Create .env file
-   echo "GEMINI_API_KEY=your_api_key_here" > .env
-   ```
-
-4. **Start Development Server**
-
-   ```bash
-   npm run dev
-   ```
-
-5. **Open Browser**
-   - Visit [http://localhost:3000](http://localhost:3000)
-
-## How to Use
-
-1. Click "Generate Phish" to create a simulated phishing email
-2. Review the generated email
-3. Click "Analyze Email" to see the security analysis
-4. Learn from the identified red flags and security recommendations
+An AI-powered educational tool for generating and analyzing phishing emails to help improve cybersecurity awareness.
 
 ## Features
 
-- AI-powered phishing email generation
-- Real-time email analysis
-- Security recommendations
-- Clean, modern UI
-- Built with Next.js, TypeScript, and Tailwind CSS
+### Manual Mode
+- Generate realistic phishing emails using AI
+- Analyze emails for security vulnerabilities
+- Detailed security reports with actionable insights
+- Educational insights into phishing tactics
 
-## Development
+### Simulation Mode
+- Run autonomous phishing simulations with multiple rounds
+- Customize target company and simulation parameters
+- Adjustable simulation speed (slow, normal, fast)
+- Interactive simulation log with expandable rounds
+- Detailed analysis of each attempt
+- Progress tracking and round management
 
-Key files:
+## Getting Started
 
-- `src/app/page.tsx` - Main UI
-- `src/app/api/generate/route.ts` - Email generation API
-- `src/app/api/analyze/route.ts` - Email analysis API
-- `src/lib/gemini.ts` - Gemini AI integration
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/phishing-app.git
+cd phishing-app
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env.local` file in the root directory and add your Gemini API key:
+```
+GEMINI_API_KEY=your_api_key_here
+```
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Usage
+
+### Manual Mode
+1. Click "Generate Phish" to create a new phishing email
+2. Review the generated email
+3. Click "Analyze Email" to get a detailed security analysis
+4. Study the analysis to understand the phishing tactics used
+
+### Simulation Mode
+1. Switch to "Simulation Mode"
+2. Configure simulation parameters:
+   - Set target company
+   - Choose number of rounds (1-10)
+   - Select simulation speed
+3. Click "Run Simulation" to start
+4. Monitor progress in real-time
+5. Review results in the interactive simulation log
+6. Use the "Clear Results" button to start a new simulation
+
+## Features in Detail
+
+### Email Generation
+- Uses Google's Gemini AI model
+- Implements various phishing tactics:
+  - Sender spoofing
+  - Urgency and fear tactics
+  - Authority exploitation
+  - Social proof
+  - Call to action
+  - Personal information requests
+  - Time pressure
+  - Trust building
+  - Curiosity triggers
+  - Reciprocity
+
+### Email Analysis
+- Comprehensive security report including:
+  - Risk level assessment
+  - Key red flags identification
+  - Security recommendations
+  - Technical analysis
+  - Social engineering tactics breakdown
+
+### Simulation Features
+- Autonomous learning between rounds
+- Context-aware email generation
+- Progressive improvement based on analysis
+- Interactive round-by-round review
+- Expandable detailed views
+- Simulation summary statistics
 
 ## Security Note
 
-This application is for educational purposes only. The generated emails are simulations to help understand and identify phishing tactics. Do not use for malicious purposes.
+This tool is designed for educational purposes only. It helps users:
+- Understand common phishing tactics
+- Learn to identify suspicious emails
+- Develop better security awareness
+- Practice email analysis skills
+
+Do not use this tool for malicious purposes or to create actual phishing campaigns.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT
+This project is licensed under the MIT License - see the LICENSE file for details.
