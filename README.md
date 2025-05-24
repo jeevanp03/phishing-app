@@ -1,62 +1,66 @@
 # PhishGen & PhishBuster
 
-A Next.js web application that demonstrates how AI can both generate phishing emails and detect them. The app features two AI agents – an "attacker" (phishing email generator) and a "defender" (phishing detector) – interacting via a simple UI.
+A Next.js web application that demonstrates how AI can both generate phishing emails and detect them. Built for educational purposes to help understand and identify phishing tactics.
 
-## Features
+## Quick Start
 
-- Generate realistic phishing emails using Google's Gemini AI
-- Analyze emails for phishing indicators using AI
-- Clean, modern UI with loading states and error handling
-- Built with Next.js, TypeScript, and Tailwind CSS
+1. **Clone and Install**
 
-## Prerequisites
-
-- Node.js 18+ and npm
-- Google Gemini API key (get one from [Google AI Studio](https://makersuite.google.com/app/apikey))
-
-## Setup
-
-1. Clone the repository:
    ```bash
    git clone <repository-url>
    cd phishing-app
-   ```
-
-2. Install dependencies:
-   ```bash
    npm install
    ```
 
-3. Create a `.env.local` file in the root directory and add your Gemini API key:
-   ```
-   GEMINI_API_KEY=your_api_key_here
+2. **Get API Key**
+
+   - Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Create a new API key
+   - Copy the key
+
+3. **Setup Environment**
+
+   ```bash
+   # Create .env file
+   echo "GEMINI_API_KEY=your_api_key_here" > .env
    ```
 
-4. Start the development server:
+4. **Start Development Server**
+
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. **Open Browser**
+   - Visit [http://localhost:3000](http://localhost:3000)
 
-## Usage
+## How to Use
 
-1. Click the "Generate Phish" button to create a new phishing email
+1. Click "Generate Phish" to create a simulated phishing email
 2. Review the generated email
-3. Click "Analyze Email" to see the AI's analysis of the phishing attempt
-4. Repeat to explore different scenarios
+3. Click "Analyze Email" to see the security analysis
+4. Learn from the identified red flags and security recommendations
+
+## Features
+
+- AI-powered phishing email generation
+- Real-time email analysis
+- Security recommendations
+- Clean, modern UI
+- Built with Next.js, TypeScript, and Tailwind CSS
 
 ## Development
 
-- `src/app/page.tsx` - Main UI component
-- `src/app/api/generate/route.ts` - API route for generating phishing emails
-- `src/app/api/analyze/route.ts` - API route for analyzing emails
-- `src/lib/gemini.ts` - Gemini AI client setup
-- `src/components/` - Reusable UI components
+Key files:
+
+- `src/app/page.tsx` - Main UI
+- `src/app/api/generate/route.ts` - Email generation API
+- `src/app/api/analyze/route.ts` - Email analysis API
+- `src/lib/gemini.ts` - Gemini AI integration
 
 ## Security Note
 
-This application is for educational purposes only. The generated phishing emails are simulations and should not be used for malicious purposes. Always use AI responsibly and ethically.
+This application is for educational purposes only. The generated emails are simulations to help understand and identify phishing tactics. Do not use for malicious purposes.
 
 ## License
 
