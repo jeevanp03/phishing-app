@@ -23,6 +23,8 @@ const PROVIDERS = {
 
 type Provider = keyof typeof PROVIDERS;
 
+type AnalyzerMode = 'standard' | 'sophisticated';
+
 async function testImapConnection({ host, port, user, password, tls }: { host: string; port: number; user: string; password: string; tls: boolean; }) {
   // Use the same API endpoint but only try to connect and logout
   try {
@@ -41,6 +43,21 @@ async function testImapConnection({ host, port, user, password, tls }: { host: s
   }
 }
 
+// Helper to fetch emails via IMAP (using the existing /api/analyze endpoint)
+async function fetchImapEmails({ host, port, user, password, tls, maxResults }: { host: string; port: number; user: string; password: string; tls: boolean; maxResults: number; }) {
+  const response = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ host, port, user, password, tls, maxResults }),
+  });
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || 'Failed to fetch emails');
+  }
+  const data = await response.json();
+  return data.analyzedEmails || [];
+}
+
 export default function ImapEmailAnalyzer() {
   const [provider, setProvider] = useState<Provider>('Gmail');
   const [host, setHost] = useState(PROVIDERS.Gmail.host);
@@ -55,6 +72,8 @@ export default function ImapEmailAnalyzer() {
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<any[]>([]);
   const [testSuccess, setTestSuccess] = useState<boolean | null>(null);
+  const [analyzerMode, setAnalyzerMode] = useState<AnalyzerMode>('standard');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleProviderChange = (prov: Provider) => {
     setProvider(prov);
@@ -94,6 +113,7 @@ export default function ImapEmailAnalyzer() {
     }
   };
 
+  // Per-email agentic analysis for IMAP
   const handleAnalyze = async () => {
     if (!validate()) return;
     setIsLoading(true);
@@ -101,24 +121,64 @@ export default function ImapEmailAnalyzer() {
     setResults([]);
     setTestSuccess(null);
     try {
-      const response = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ host, port, user, password, tls, maxResults }),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        if (data.error && data.error.includes('Invalid credentials')) {
-          setError('Authentication failed: Invalid credentials. Please check your email and app password.');
-        } else if (data.error && data.error.includes('Application-specific password required')) {
-          setError('Gmail: Application-specific password required. See the instructions above.');
-        } else {
-          setError(data.error || 'Failed to analyze emails');
+      if (analyzerMode === 'standard') {
+        // Standard IMAP analysis
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ host, port, user, password, tls, maxResults }),
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          if (data.error && data.error.includes('Invalid credentials')) {
+            setError('Authentication failed: Invalid credentials. Please check your email and app password.');
+          } else if (data.error && data.error.includes('Application-specific password required')) {
+            setError('Gmail: Application-specific password required. See the instructions above.');
+          } else {
+            setError(data.error || 'Failed to analyze emails');
+          }
+          return;
         }
-        return;
+        const data = await response.json();
+        setResults(data.analyzedEmails || []);
+      } else {
+        // Sophisticated: fetch emails, then analyze each one
+        const emails = await fetchImapEmails({ host, port, user, password, tls, maxResults });
+        if (!emails.length) {
+          setError('No emails found.');
+          return;
+        }
+        const sophisticatedResults: any[] = [];
+        const endpoint = '/api/sophisticated-agentic-analyze';
+        for (let i = 0; i < emails.length; i++) {
+          const emailObj = emails[i];
+          const emailPayload = {
+            from: emailObj.email.from,
+            subject: emailObj.email.subject,
+            date: emailObj.email.date,
+            body: emailObj.email.body,
+            headers: emailObj.email.headers || {},
+            links: emailObj.email.links || [],
+          };
+          try {
+            const resp = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: emailPayload }),
+            });
+            if (!resp.ok) {
+              const data = await resp.json();
+              sophisticatedResults.push({ ...emailObj, analysis: data.error || `Failed to analyze (sophisticated).` });
+            } else {
+              const data = await resp.json();
+              sophisticatedResults.push({ ...emailObj, analysis: data.analysis });
+            }
+          } catch (err: any) {
+            sophisticatedResults.push({ ...emailObj, analysis: err.message || 'Sophisticated analysis error.' });
+          }
+        }
+        setResults(sophisticatedResults);
       }
-      const data = await response.json();
-      setResults(data.analyzedEmails || []);
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
@@ -146,6 +206,42 @@ export default function ImapEmailAnalyzer() {
           {PROVIDERS[provider].note}
         </div>
       </div>
+
+      {/* Analyzer mode selector and tooltip */}
+      <div className="mb-4 flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <select
+            value={analyzerMode}
+            onChange={(e) => setAnalyzerMode(e.target.value as AnalyzerMode)}
+            className="px-3 py-1 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="standard">Standard Analysis</option>
+            <option value="sophisticated">Sophisticated Agentic Analysis</option>
+          </select>
+          <span
+            className="ml-1 text-blue-500 cursor-pointer relative"
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+            tabIndex={0}
+          >
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white" /><text x="12" y="16" textAnchor="middle" fontSize="12" fill="currentColor">i</text></svg>
+            {showTooltip && (
+              <span className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
+                <b>Standard:</b> Uses a fixed pipeline of traditional checks and LLM analysis.<br/>
+                <b>Sophisticated:</b> Advanced agentic analysis with header analysis, domain reputation, content patterns, and link reputation checks.
+              </span>
+            )}
+          </span>
+        </div>
+        <span className={`text-xs px-2 py-1 rounded ${
+          analyzerMode === 'sophisticated' ? 'bg-purple-100 text-purple-700' :
+          'bg-gray-100 text-gray-600'
+        }`}>
+          {analyzerMode === 'sophisticated' ? 'Sophisticated' :
+           'Standard'}
+        </span>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label className="block text-sm font-medium">IMAP Host</label>
@@ -191,7 +287,8 @@ export default function ImapEmailAnalyzer() {
           disabled={isLoading || isTesting || testSuccess === false}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          {isLoading ? 'Analyzing...' : 'Analyze Emails'}
+          {isLoading ? `Analyzing (${analyzerMode})...` : `Analyze Emails (${analyzerMode === 'sophisticated' ? 'Sophisticated' :
+                                                         'Standard'})`}
         </button>
       </div>
       {testSuccess === true && <div className="mb-4 text-green-700 bg-green-50 p-2 rounded">Connection successful!</div>}
@@ -208,24 +305,38 @@ export default function ImapEmailAnalyzer() {
                     <div className="font-medium">{result.email.subject}</div>
                     <div className="text-xs text-gray-600">{result.email.from}</div>
                   </div>
-                  <div className={`px-2 py-1 rounded text-xs ${result.analysis.isPhishing ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                    {result.analysis.isPhishing ? 'Phishing' : 'Safe'}
+                  <div className={`px-2 py-1 rounded text-xs ${result.analysis && typeof result.analysis === 'object' ? (result.analysis.isPhishing ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800') : ''}`}>
+                    {result.analysis && typeof result.analysis === 'object'
+                      ? (result.analysis.isPhishing ? 'Phishing' : 'Safe')
+                      : null}
                   </div>
                 </div>
                 <div className="text-sm text-gray-700 mb-1">{result.email.body.slice(0, 200)}{result.email.body.length > 200 ? '...' : ''}</div>
                 <div className="text-xs text-gray-500">Date: {result.email.date}</div>
                 <div className="mt-2">
-                  <div className="font-semibold text-sm">Risk Score: {result.analysis.riskScore}</div>
-                  <div className="text-xs">Confidence: {(result.analysis.confidence * 100).toFixed(1)}%</div>
-                  {result.analysis.reasons && (
-                    <ul className="list-disc ml-5 text-xs text-gray-700">
-                      {result.analysis.reasons.map((r: string, i: number) => <li key={i}>{r}</li>)}
-                    </ul>
-                  )}
-                  {result.analysis.recommendations && (
-                    <ul className="list-disc ml-5 text-xs text-gray-700 mt-1">
-                      {result.analysis.recommendations.map((r: string, i: number) => <li key={i}>{r}</li>)}
-                    </ul>
+                  {result.analysis && typeof result.analysis === 'object' && !result.analysis.error ? (
+                    <>
+                      <div className="font-semibold text-sm">Risk Score: {result.analysis.riskScore}</div>
+                      <div className="text-xs">Confidence: {(result.analysis.confidence * 100).toFixed(1)}%</div>
+                      {result.analysis.reasons && (
+                        <ul className="list-disc ml-5 text-xs text-gray-700">
+                          {result.analysis.reasons.map((r: string, i: number) => <li key={i}>{r}</li>)}
+                        </ul>
+                      )}
+                      {result.analysis.recommendations && (
+                        <ul className="list-disc ml-5 text-xs text-gray-700 mt-1">
+                          {result.analysis.recommendations.map((r: string, i: number) => <li key={i}>{r}</li>)}
+                        </ul>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-xs text-red-700">
+                      {result.analysis?.error
+                        ? result.analysis.error
+                        : typeof result.analysis === 'string'
+                          ? result.analysis
+                          : 'No analysis.'}
+                    </div>
                   )}
                 </div>
               </div>
