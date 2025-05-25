@@ -52,7 +52,7 @@ cd phishing-app
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory and add your API keys:
+3. Create a `.env` file in the root directory and add your API keys:
 ```
 GEMINI_API_KEY=your_gemini_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
