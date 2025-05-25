@@ -5,8 +5,9 @@ import { EmailDisplay } from '@/components/EmailDisplay';
 import { AnalysisDisplay } from '@/components/AnalysisDisplay';
 import { SimulationLog } from '@/components/SimulationLog';
 import ImapEmailAnalyzer from '@/components/ImapEmailAnalyzer';
+import ManualEmailAnalyzer from '@/components/ManualEmailAnalyzer';
 
-type Mode = 'manual' | 'simulation' | 'imap';
+type Mode = 'manual' | 'simulation' | 'imap' | 'manual-analysis';
 
 interface SimulationRound {
   round: number;
@@ -149,7 +150,17 @@ export default function Home() {
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          Email Analysis
+          IMAP Analysis
+        </button>
+        <button
+          onClick={() => setMode('manual-analysis')}
+          className={`px-4 py-2 rounded-lg ${
+            mode === 'manual-analysis'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          Manual Analysis
         </button>
       </div>
       
@@ -261,8 +272,10 @@ export default function Home() {
 
           <SimulationLog rounds={simulationRounds} isLoading={isSimulating} />
         </div>
-      ) : (
+      ) : mode === 'imap' ? (
         <ImapEmailAnalyzer />
+      ) : (
+        <ManualEmailAnalyzer />
       )}
     </main>
   );

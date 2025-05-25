@@ -10,7 +10,8 @@ An AI-powered educational tool for generating and analyzing phishing emails to h
 - Detailed security reports with actionable insights
 - Educational insights into phishing tactics
 
-### Email Analysis Mode
+### Email Analysis Modes
+#### IMAP Analysis
 - Connect to email accounts via IMAP
 - Analyze existing emails for phishing attempts
 - Support for major email providers (Gmail, Outlook, Yahoo)
@@ -22,6 +23,13 @@ An AI-powered educational tool for generating and analyzing phishing emails to h
   - Header authentication checks
   - Content pattern analysis
   - Actionable recommendations
+
+#### Manual Analysis
+- Paste any email content for instant analysis
+- No account connection required
+- Same comprehensive analysis as IMAP mode
+- Perfect for analyzing suspicious emails without connecting accounts
+- Quick and easy to use
 
 ### Simulation Mode
 - Run autonomous phishing simulations with multiple rounds
@@ -65,8 +73,9 @@ npm run dev
 3. Click "Analyze Email" to get a detailed security analysis
 4. Study the analysis to understand the phishing tactics used
 
-### Email Analysis Mode
-1. Switch to "Email Analysis" tab
+### Email Analysis Modes
+#### IMAP Analysis
+1. Switch to "IMAP Analysis" tab
 2. Select your email provider
 3. Enter your IMAP credentials:
    - For Gmail: Use an App Password
@@ -76,6 +85,12 @@ npm run dev
 5. Select the number of emails to analyze
 6. Click "Analyze Emails" to start the analysis
 7. Review the detailed security report for each email
+
+#### Manual Analysis
+1. Switch to "Manual Analysis" tab
+2. Paste the email content you want to analyze
+3. Click "Analyze Email" to start the analysis
+4. Review the detailed security report
 
 ### Simulation Mode
 1. Switch to "Simulation Mode"
