@@ -10,6 +10,19 @@ An AI-powered educational tool for generating and analyzing phishing emails to h
 - Detailed security reports with actionable insights
 - Educational insights into phishing tactics
 
+### Email Analysis Mode
+- Connect to email accounts via IMAP
+- Analyze existing emails for phishing attempts
+- Support for major email providers (Gmail, Outlook, Yahoo)
+- Real-time analysis with OpenAI's GPT-4
+- Detailed security reports including:
+  - Phishing probability and confidence scores
+  - Link analysis and reputation checks
+  - Sender domain analysis
+  - Header authentication checks
+  - Content pattern analysis
+  - Actionable recommendations
+
 ### Simulation Mode
 - Run autonomous phishing simulations with multiple rounds
 - Customize target company and simulation parameters
@@ -31,9 +44,10 @@ cd phishing-app
 npm install
 ```
 
-3. Create a `.env.local` file in the root directory and add your Gemini API key:
+3. Create a `.env.local` file in the root directory and add your API keys:
 ```
-GEMINI_API_KEY=your_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 4. Run the development server:
@@ -50,6 +64,18 @@ npm run dev
 2. Review the generated email
 3. Click "Analyze Email" to get a detailed security analysis
 4. Study the analysis to understand the phishing tactics used
+
+### Email Analysis Mode
+1. Switch to "Email Analysis" tab
+2. Select your email provider
+3. Enter your IMAP credentials:
+   - For Gmail: Use an App Password
+   - For Outlook: Use your email password
+   - For Yahoo: Use an App Password
+4. Click "Test Connection" to verify credentials
+5. Select the number of emails to analyze
+6. Click "Analyze Emails" to start the analysis
+7. Review the detailed security report for each email
 
 ### Simulation Mode
 1. Switch to "Simulation Mode"
@@ -80,11 +106,21 @@ npm run dev
 
 ### Email Analysis
 - Comprehensive security report including:
-  - Risk level assessment
+  - Risk level assessment (0-100)
+  - Confidence score (0-1)
   - Key red flags identification
   - Security recommendations
-  - Technical analysis
-  - Social engineering tactics breakdown
+  - Technical analysis:
+    - Link reputation and redirect chains
+    - Sender domain reputation
+    - SPF/DKIM/DMARC authentication
+    - Header spoofing attempts
+  - Content analysis:
+    - Urgency level
+    - Authority claims
+    - Personal info requests
+    - Grammatical errors
+    - Suspicious patterns
 
 ### Simulation Features
 - Autonomous learning between rounds

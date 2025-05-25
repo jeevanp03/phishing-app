@@ -1,23 +1,25 @@
 import { NextResponse } from 'next/server';
-import { analyzePhishingEmail } from '@/lib/gemini';
+import { analyzeIMAPEmails } from '@/lib/agents/openai_agent';
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json();
-    
-    if (!email) {
+    const { host, port, user, password, tls = true, maxResults = 10 } = await request.json();
+
+    if (!host || !port || !user || !password) {
       return NextResponse.json(
-        { error: 'Email content is required' },
+        { error: 'IMAP credentials (host, port, user, password) are required' },
         { status: 400 }
       );
     }
 
-    const analysis = await analyzePhishingEmail(email);
-    return NextResponse.json({ analysis });
+    const imapConfig = { host, port, auth: { user, pass: password }, tls };
+
+    const analyzedEmails = await analyzeIMAPEmails(imapConfig, maxResults);
+    return NextResponse.json({ analyzedEmails });
   } catch (error) {
-    console.error('Error analyzing email:', error);
+    console.error('Error analyzing emails via IMAP:', error);
     return NextResponse.json(
-      { error: 'Failed to analyze email' },
+      { error: 'Failed to analyze emails via IMAP' },
       { status: 500 }
     );
   }

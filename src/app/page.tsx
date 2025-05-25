@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { EmailDisplay } from '@/components/EmailDisplay';
 import { AnalysisDisplay } from '@/components/AnalysisDisplay';
 import { SimulationLog } from '@/components/SimulationLog';
+import ImapEmailAnalyzer from '@/components/ImapEmailAnalyzer';
 
-type Mode = 'manual' | 'simulation';
+type Mode = 'manual' | 'simulation' | 'imap';
 
 interface SimulationRound {
   round: number;
@@ -140,6 +141,16 @@ export default function Home() {
         >
           Simulation Mode
         </button>
+        <button
+          onClick={() => setMode('imap')}
+          className={`px-4 py-2 rounded-lg ${
+            mode === 'imap'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+          }`}
+        >
+          Email Analysis
+        </button>
       </div>
       
       {error && (
@@ -178,7 +189,7 @@ export default function Home() {
             <AnalysisDisplay analysis={analysis} isLoading={isAnalyzing} />
           </div>
         </div>
-      ) : (
+      ) : mode === 'simulation' ? (
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
@@ -250,6 +261,8 @@ export default function Home() {
 
           <SimulationLog rounds={simulationRounds} isLoading={isSimulating} />
         </div>
+      ) : (
+        <ImapEmailAnalyzer />
       )}
     </main>
   );
